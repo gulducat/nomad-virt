@@ -21,9 +21,10 @@ build {
 }
 
 locals {
-  is_mac      = ! fileexists("/etc/os-release") # lazy, assume mac if not linux
-  cpu_arch    = local.is_mac ? "aarch64" : "x86_64" # assume arm chips on mac
-  accelerator = local.is_mac ? "hvf" : "kvm"
+  is_mac       = !fileexists("/etc/os-release")      # lazy, assume mac if not linux
+  cpu_arch     = local.is_mac ? "aarch64" : "x86_64" # assume arm chips on mac
+  accelerator  = local.is_mac ? "hvf" : "kvm"
+  machine_type = local.is_mac ? "virt" : "q35"
   # images: https://fedoraproject.org/cloud/download/
   image_url = "https://download.fedoraproject.org/pub/fedora/linux/releases/43/Cloud/${local.cpu_arch}/images/Fedora-Cloud-Base-Generic-43-1.6.${local.cpu_arch}.qcow2"
   checksum  = local.is_mac ? "66031aea9ec61e6d0d5bba12b9454e80ca94e8a79c913d37ded4c60311705b8b" : "846574c8a97cd2d8dc1f231062d73107cc85cbbbda56335e264a46e3a6c8ab2f"
@@ -32,8 +33,9 @@ locals {
 # https://developer.hashicorp.com/packer/integrations/hashicorp/qemu/latest/components/builder/qemu
 source "qemu" "fedora" {
   # runtime
-  qemu_binary = "qemu-system-${local.cpu_arch}"
-  accelerator = local.accelerator
+  qemu_binary  = "qemu-system-${local.cpu_arch}"
+  machine_type = local.machine_type
+  accelerator  = local.accelerator
 
   # source image
   iso_url              = local.image_url
