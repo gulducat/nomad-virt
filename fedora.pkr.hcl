@@ -1,3 +1,7 @@
+variable "open_console" {
+  default = false
+}
+
 variable "user_name" {
   default = "fedora"
 }
@@ -64,7 +68,8 @@ source "qemu" "fedora" {
   ssh_password = var.user_pass
 
   # misc
-  headless         = true
+  headless         = ! var.open_console
+  display          = local.is_mac ? "cocoa" : "gtk"
   boot_wait        = "-1s" # we're not using a boot_command, so no need to wait
   shutdown_command = "echo '${var.user_pass}' | sudo -S shutdown -P now"
 }
